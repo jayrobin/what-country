@@ -1,4 +1,6 @@
 get '/' do
+  @question = Question.get_random_question
+
   erb :index
 end
 

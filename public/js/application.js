@@ -1,7 +1,26 @@
-$(document).ready(function() {
-  // This is called after the document has loaded in its entirety
-  // This guarantees that any elements we bind to will exist on the page
-  // when we try to bind to them
+function createMap() {
+  var mapOptions =
+  {
+    scrollwheel: false,
+    disableDoubleClickZoom: true,
+    center: new google.maps.LatLng(40, -100),
+    zoom: 2,
+    disableDefaultUI: true
+  };
+  map = new google.maps.Map(document.getElementById("google_map"), mapOptions);
+  google.maps.event.addListener(map, 'click', function(event) {
+    placeMarker(event.latLng);
+  });
+}
 
-  // See: http://docs.jquery.com/Tutorials:Introducing_$(document).ready()
+function placeMarker(location) {
+  var marker = new google.maps.Marker({
+    position: location,
+    map: map
+  });
+}
+
+
+$(document).ready(function() {
+  createMap();
 });

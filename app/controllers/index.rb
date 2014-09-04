@@ -1,6 +1,5 @@
 get '/' do
   @question = Question.get_random_question
-
   erb :index
 end
 
@@ -16,4 +15,11 @@ end
 get '/all' do
   @pins = Pin.all
   erb :index
+end
+
+get '/question/random' do
+  @question = Question.get_random_question
+
+  content_type :json
+  { content: @question.content }.to_json
 end

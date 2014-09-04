@@ -1,4 +1,6 @@
 var map;
+var heatmap;
+var allPins = [];
 var markerPlaced = false;
 
 function createMap() {
@@ -21,6 +23,7 @@ var addPin = function(pinLoc) {
     position: pinLoc,
     map: map
   });
+  allPins.push(marker);
 }
 
 var addPins = function(pins) {
@@ -30,10 +33,11 @@ var addPins = function(pins) {
   }
 }
 var renderHeatMap = function(pins) {
-  var heatmap = new google.maps.visualization.HeatmapLayer({
+  heatmap = new google.maps.visualization.HeatmapLayer({
     data: pins
   });
   heatmap.setMap(map);
+  heatmap.set('radius', heatmap.get('radius') ? null : 15);
 }
 
 var converJSONtoPins = function(json) {
@@ -54,6 +58,31 @@ var placeMarker = function(pinLoc) {
   }
 }
 
+var resetMap = function() {
+  for(var i = 0; i < allPins.length; i++) {
+    var pin = allPins[i];
+    pin.setMap(null);
+  }
+  heatmap.setMap(null);
+  markerPlaced = false;
+}
+
+var ajaxFail = function() {
+  alert("Please try again");
+}
+
 $(document).ready(function() {
+  $("#next-question").on("click", function(e) {
+    e.preventDefault();
+    $.ajax({
+      url: $(this).attr("href"),
+      type: "get"
+    }).done(function(result) {
+      $("#question").html(result.content);
+      resetMap();
+    }).fail(function() {
+      ajaxFail();
+    })
+  });
   createMap();
 });

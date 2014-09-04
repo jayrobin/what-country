@@ -3,12 +3,14 @@ get '/' do
   erb :index
 end
 
-post '/pin/new' do
-  @pin = Pin.new(params)
+post 'question/:id/pin/new' do
+  @question = Question.find(params[:id])
+  @pin = @question.pins.new(x: params[:x], y: params[:y])
+
   if @pin.valid?
     @pin.save!
     content_type :json
-    Pin.all_to_json
+    @question.get_all_pins_as_json
   end
 end
 

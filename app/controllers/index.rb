@@ -9,6 +9,8 @@ post '/question/:id/pin/new' do
 
   if @pin.valid?
     @pin.save!
+    current_user.pins << @pin
+
     content_type :json
     @question.get_all_pins_as_json
   end

@@ -1,5 +1,6 @@
 class Question < ActiveRecord::Base
   validates_presence_of :content
+  has_many :pins
 
   def self.get_random_question
     Question.limit(1).order("RANDOM()").first

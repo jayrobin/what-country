@@ -51,9 +51,10 @@ var placeMarker = function(pinLoc) {
   if(!markerPlaced) {
     markerPlaced = true;
     addPin(pinLoc);
-
+    console.log(pinLoc);
     var questionID = $("#question span").attr("id");
     $.post("question/" + questionID + "/pin/new", {x: pinLoc.k, y: pinLoc.B}, function(result) {
+      console.log(result);
       pins = converJSONtoPins(result);
       renderHeatMap(pins);
     });
@@ -65,7 +66,9 @@ var resetMap = function() {
     var pin = allPins[i];
     pin.setMap(null);
   }
+  allPins = [];
   heatmap.setMap(null);
+  heatmap = null;
   markerPlaced = false;
 }
 
@@ -80,6 +83,8 @@ $(document).ready(function() {
       url: $(this).attr("href"),
       type: "get"
     }).done(function(result) {
+      console.log(result);
+      $("#question span").attr("id", result.id);
       $("#question span").html(result.content);
       resetMap();
     }).fail(function() {

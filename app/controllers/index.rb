@@ -3,7 +3,7 @@ get '/' do
   erb :index
 end
 
-post 'question/:id/pin/new' do
+post '/question/:id/pin/new' do
   @question = Question.find(params[:id])
   @pin = @question.pins.new(x: params[:x], y: params[:y])
 
@@ -23,5 +23,5 @@ get '/question/random' do
   @question = Question.get_random_question
 
   content_type :json
-  { content: @question.content }.to_json
+  { id: @question.id, content: @question.content }.to_json
 end

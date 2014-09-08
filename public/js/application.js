@@ -2,6 +2,7 @@ var map;
 var heatmap;
 var allPins = [];
 var markerPlaced = false;
+var userLocation;
 
 function createMap() {
   var mapOptions =
@@ -13,6 +14,7 @@ function createMap() {
     disableDefaultUI: true
   };
   map = new google.maps.Map(document.getElementById("google_map"), mapOptions);
+  getUserLocation();
   google.maps.event.addListener(map, 'click', function(event) {
     placeMarker(event.latLng);
   });
@@ -50,14 +52,51 @@ var converJSONtoPins = function(json) {
 var placeMarker = function(pinLoc) {
   if(!markerPlaced) {
     markerPlaced = true;
+    map.panTo(pinLoc);
     addPin(pinLoc);
-    console.log(pinLoc);
     var questionID = $("#question span").attr("id");
-    $.post("question/" + questionID + "/pin/new", {x: pinLoc.k, y: pinLoc.B}, function(result) {
-      console.log(result);
-      pins = converJSONtoPins(result);
-      renderHeatMap(pins);
-    });
+    $.ajax({
+      type: "post",
+      url: "question/" + questionID + "/pin/new",
+      data: {x: pinLoc.k, y: pinLoc.B},
+      timeout: 10000
+    }).done(handleAddPinResponse).fail(resetMap)
+  }
+}
+
+var getUserLocation = function() {
+  navigator.geolocation.getCurrentPosition(function(position) {
+    userLocation = new google.maps.LatLng(position.coords.latitude,
+                                          position.coords.longitude);
+    console.log(userLocation);
+    centerMapOnUser();
+    $.ajax({
+      type: "post",
+      url: "user/new",
+      data: {x: userLocation.k, y: userLocation.B}
+    })
+  });
+}
+
+var centerMapOnUser = function() {
+  if(userLocation) {
+    map.panTo(userLocation);
+  }
+}
+
+var handleAddPinResponse = function(result) {
+  pins = converJSONtoPins(result);
+  renderHeatMap(pins);
+}
+
+var handleNextQuestionResponse = function(result) {
+  if($.isEmptyObject(result)) {
+    $("main").empty();
+  }
+  else {
+    $("#question span").attr("id", result.id);
+    $("#question span").html(result.content);
+    resetMap();
   }
 }
 
@@ -72,24 +111,17 @@ var resetMap = function() {
   markerPlaced = false;
 }
 
-var ajaxFail = function() {
-  alert("Please try again");
-}
-
-$(document).ready(function() {
+var bindEventListeners = function() {
   $("#next-question").on("click", function(e) {
     e.preventDefault();
     $.ajax({
       url: $(this).attr("href"),
       type: "get"
-    }).done(function(result) {
-      console.log(result);
-      $("#question span").attr("id", result.id);
-      $("#question span").html(result.content);
-      resetMap();
-    }).fail(function() {
-      ajaxFail();
-    })
+    }).done(handleNextQuestionResponse)
   });
+}
+
+$(document).ready(function() {
+  bindEventListeners();
   createMap();
 });

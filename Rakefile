@@ -84,16 +84,19 @@ namespace :generate do
 end
 
 namespace :db do
+  desc "Drop, create, and migrate the database"
+  task :reset => [:drop, :create, :migrate, :seed]
+
   desc "Create the database at #{DB_NAME} and at #{APP_NAME}_test"
   task :create do
     puts "Creating database #{DB_NAME} and #{APP_NAME}_test if it doesn't exist..."
-    exec("createdb #{DB_NAME} && createdb #{APP_NAME}_test")
+    system("createdb #{DB_NAME} && createdb #{APP_NAME}_test")
   end
 
   desc "Drop the database at #{DB_NAME} and #{APP_NAME}_test"
   task :drop do
     puts "Dropping database #{DB_NAME} and #{APP_NAME}_test..."
-    exec("dropdb #{DB_NAME} && dropdb #{APP_NAME}_test")
+    system("dropdb #{DB_NAME} && dropdb #{APP_NAME}_test")
   end
 
   desc "Migrate the database (options: VERSION=x, VERBOSE=false, SCOPE=blog)."

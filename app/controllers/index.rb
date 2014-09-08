@@ -1,6 +1,10 @@
 get '/' do
-  @question = Question.get_random_question
-  erb :index
+  @question = current_user.get_unanswered_question
+  if @question
+    erb :index
+  else
+    # GAME OVER
+  end
 end
 
 post '/question/:id/pin/new' do
@@ -22,8 +26,17 @@ get '/all' do
 end
 
 get '/question/random' do
-  @question = Question.get_random_question
-
+  @question = current_user.get_unanswered_question
   content_type :json
-  { id: @question.id, content: @question.content }.to_json
+
+  if @question
+    { id: @question.id, content: @question.content }.to_json
+  else
+    # GAME OVER
+    {}.to_json
+  end
+end
+
+post '/user/new' do
+  create_user
 end

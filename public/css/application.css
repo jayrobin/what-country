@@ -1,6 +1,12 @@
 #google_map {
   width: 800px;
   height: 600px;
-  margin: 50px auto;
+  margin: 20px auto;
   background-color: grey;
 }
+
+main {
+	text-align: center;
+}
+
+#next-question { }

@@ -3,6 +3,7 @@ var heatmap;
 var allPins = [];
 var markerPlaced = false;
 var userLocation;
+var userMarker;
 
 function createMap() {
   var mapOptions =
@@ -26,6 +27,8 @@ var addPin = function(pinLoc) {
     map: map
   });
   allPins.push(marker);
+
+  return marker;
 }
 
 var addPins = function(pins) {
@@ -53,7 +56,8 @@ var placeMarker = function(pinLoc) {
   if(!markerPlaced) {
     markerPlaced = true;
     map.panTo(pinLoc);
-    addPin(pinLoc);
+    userMarker = addPin(pinLoc);
+    userMarker.setAnimation(google.maps.Animation.BOUNCE);
     var questionID = $("#question span").attr("id");
     $.ajax({
       type: "post",
@@ -87,6 +91,8 @@ var centerMapOnUser = function() {
 var handleAddPinResponse = function(result) {
   pins = converJSONtoPins(result);
   renderHeatMap(pins);
+  console.log(userMarker);
+  userMarker.setAnimation(null);
 }
 
 var handleNextQuestionResponse = function(result) {
@@ -115,7 +121,7 @@ var bindEventListeners = function() {
   $("#next-question").on("click", function(e) {
     e.preventDefault();
     $.ajax({
-      url: $(this).attr("href"),
+      url: "/question/random",
       type: "get"
     }).done(handleNextQuestionResponse)
   });

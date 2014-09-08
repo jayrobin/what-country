@@ -1,5 +1,9 @@
+
 <main>
-  <h3 id="question"><span id="<%= @question.id %>"><%= @question.content %></span></h3>
-  <div id="google_map" ></div>
-  <a href="/question/random" id="next-question">Next question</a>
+	<div class="page_header">
+		<h1 id="question"><span id="<%= @question.id %>"><%= @question.content %></span></h1>
+	</div>
+
+	<button type="button" class="btn btn-default" id="next-question">Next question</button>
+	<div id="google_map" ></div>
 </main>

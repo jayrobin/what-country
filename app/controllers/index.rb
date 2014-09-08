@@ -38,5 +38,5 @@ get '/question/random' do
 end
 
 post '/user/new' do
-  create_user
+  find_or_create_user
 end

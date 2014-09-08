@@ -6,7 +6,7 @@ def current_user
   end
 end
 
-def create_user
+def find_or_create_user
   user = User.find_or_create_by(username: request.ip)
   session[:id] = user.id
   user.set_location(params[:x], params[:y]) if params[:x] && params[:y]

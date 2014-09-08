@@ -112,7 +112,6 @@ var centerMapOnLocation = function(location) {
 var handleAddPinResponse = function(result) {
   pins = converJSONtoPins(result);
   renderHeatMap(pins);
-  console.log(userMarker);
   userMarker.setAnimation(null);
 }
 

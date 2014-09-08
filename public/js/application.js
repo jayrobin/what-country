@@ -55,7 +55,7 @@ var converJSONtoPins = function(json) {
 var placeMarker = function(pinLoc) {
   if(!markerPlaced) {
     markerPlaced = true;
-    map.panTo(pinLoc);
+    centerMapOnLocation(pinLoc);
     userMarker = addPin(pinLoc);
     userMarker.setAnimation(google.maps.Animation.BOUNCE);
     var questionID = $("#question span").attr("id");
@@ -72,20 +72,41 @@ var getUserLocation = function() {
   navigator.geolocation.getCurrentPosition(function(position) {
     userLocation = new google.maps.LatLng(position.coords.latitude,
                                           position.coords.longitude);
-    console.log(userLocation);
-    centerMapOnUser();
-    $.ajax({
-      type: "post",
-      url: "user/new",
-      data: {x: userLocation.k, y: userLocation.B}
-    })
+
+    centerMapOnLocation(userLocation);
+    getLocationDetails(userLocation);
   });
 }
 
-var centerMapOnUser = function() {
-  if(userLocation) {
-    map.panTo(userLocation);
-  }
+var getLocationDetails = function(location) {
+  $.ajax({
+    type: "get",
+    url: "http://maps.googleapis.com/maps/api/geocode/json?latlng=" + location.k + "," + location.B + "&sensor=false"
+  }).done(handleGeocodeResponse);
+}
+
+var handleGeocodeResponse = function(result) {
+  var address_data = result.results[0].address_components;
+  var country = getCountryFromGeocodeAddress(address_data);
+  var state = getProvinceFromGMapsGeocodeAddress(address_data);
+
+  $.ajax({
+    type: "post",
+    url: "user/new",
+    data: {location: {x: userLocation.k, y: userLocation.B, country: country, state: state}}
+  })
+}
+
+var getCountryFromGeocodeAddress = function(address) {
+  return address[address.length - 2].long_name;
+}
+
+var getProvinceFromGMapsGeocodeAddress = function(address) {
+  return address[address.length - 3].long_name;
+}
+
+var centerMapOnLocation = function(location) {
+  map.panTo(location);
 }
 
 var handleAddPinResponse = function(result) {
@@ -107,14 +128,24 @@ var handleNextQuestionResponse = function(result) {
 }
 
 var resetMap = function() {
+  resetPins();
+  resetHeatmap();
+  markerPlaced = false;
+}
+
+var resetPins = function() {
   for(var i = 0; i < allPins.length; i++) {
     var pin = allPins[i];
     pin.setMap(null);
   }
   allPins = [];
-  heatmap.setMap(null);
-  heatmap = null;
-  markerPlaced = false;
+}
+
+var resetHeatmap = function() {
+  if(heatmap) {
+    heatmap.setMap(null);
+    heatmap = null;
+  }
 }
 
 var bindEventListeners = function() {

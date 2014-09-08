@@ -3,8 +3,8 @@ class User < ActiveRecord::Base
   has_many :pins
   has_many :questions, through: :pins
 
-  def set_location(x, y)
-    update_attributes(x: x, y: y)
+  def set_location(location)
+    update_attributes(location)
   end
 
   def get_unanswered_question

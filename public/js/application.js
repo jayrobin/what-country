@@ -5,6 +5,13 @@ var markerPlaced = false;
 var userLocation;
 var userMarker;
 
+var categoryTemplate =  "<div id='category_{{category}}' class='category'>" +
+                        "<h4>{{category}}</h4>" +
+                        "</div>"
+
+
+var questionTemplate =  "<a id='{{id}}' class='question'>{{content}}</a>"
+
 function createMap() {
   var mapOptions =
   {
@@ -110,7 +117,7 @@ var centerMapOnLocation = function(location) {
 }
 
 var handleAddPinResponse = function(result) {
-  pins = converJSONtoPins(result);
+  pins = converJSONtoPins(result.pins);
   renderHeatMap(pins);
   userMarker.setAnimation(null);
 }
@@ -123,6 +130,55 @@ var handleNextQuestionResponse = function(result) {
     $("#question span").attr("id", result.id);
     $("#question span").html(result.content);
     resetMap();
+  }
+}
+
+var handleGetAllQuestionsResponse = function(result) {
+  for(var i = 0; i < result.length; i++) {
+    var category = result[i];
+    addCategoryHTML(category);
+  }
+
+  $("#category_list").on("click", function(ev) {
+    if($(ev.target).attr("class") === "question") {
+      var questionID = ev.target.id;
+      $.ajax({
+        url: "/question/" + questionID,
+        type: "get"
+      }).done(handleGetQuestionResponse);
+    }
+  });
+}
+
+var handleGetQuestionResponse = function(result) {
+  if($.isEmptyObject(result)) {
+    $("main").empty();
+  }
+  else {
+    $("#question span").attr("id", result.id);
+    $("#question span").html(result.content);
+    resetMap();
+    console.log(result);
+    if(result.pins) {
+      // render heatmap
+      pins = converJSONtoPins(result.pins);
+      renderHeatMap(pins);
+      markerPlaced = true;
+    }
+    else {
+      // allow pin placement
+    }
+  }
+}
+
+var addCategoryHTML = function(category) {
+  var categoryHTML = $(Mustache.to_html(categoryTemplate, category));
+  $("#category_list").append(categoryHTML);
+
+  for(var i = 0; i < category.questions.length; i++) {
+    var question = category.questions[i];
+    var questionHTML = Mustache.to_html(questionTemplate, question);
+    categoryHTML.append(questionHTML);
   }
 }
 
@@ -153,11 +209,19 @@ var bindEventListeners = function() {
     $.ajax({
       url: "/question/random",
       type: "get"
-    }).done(handleNextQuestionResponse)
+    }).done(handleNextQuestionResponse);
   });
+}
+
+var loadQuestions = function() {
+  $.ajax({
+    url: "/question",
+    type: "get"
+  }).done(handleGetAllQuestionsResponse);
 }
 
 $(document).ready(function() {
   bindEventListeners();
   createMap();
+  loadQuestions();
 });

@@ -2,12 +2,18 @@ def get_random_pos
 	{x: rand(-180..180), y: rand(-85..85)}
 end
 
+Category.delete_all
 Question.delete_all
+Pin.delete_all
 
-Question.create(content: "What country has the best food?")
-Question.create(content: "What country has the best beer?")
-Question.create(content: "What country has the ugliest people?")
-Question.create(content: "What country has the worst tourists?")
+
+cat1 = Category.create(name: "food")
+cat1.questions.create(content: "What country has the best food?")
+cat1.questions.create(content: "What country has the best beer?")
+
+cat2 = Category.create(name: "people")
+cat2.questions.create(content: "What country has the least attractive people?")
+cat2.questions.create(content: "What country has the worst tourists?")
 
 # Question ideas
 
@@ -25,6 +31,7 @@ Question.create(content: "What country has the worst tourists?")
 # people
 	# What country has the worst tourists?
 	# What country has the most attractive people?
+	# What country has the least attractive people?
 	# What country has the best accent?
 	# What country has the worst accent?
 	# What country has the friendliest people?

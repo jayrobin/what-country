@@ -16,13 +16,19 @@ post '/question/:id/pin/new' do
     current_user.pins << @pin
 
     content_type :json
-    @question.get_all_pins_as_json
+    @question.get_pin_data.to_json
   end
 end
 
 get '/all' do
   @pins = Pin.all
   erb :index
+end
+
+get '/question' do
+  content_type :json
+
+  current_user.get_unanswered_questions_as_json
 end
 
 get '/question/random' do
@@ -34,6 +40,18 @@ get '/question/random' do
   else
     # GAME OVER
     {}.to_json
+  end
+end
+
+get '/question/:id' do
+  question = Question.find(params[:id])
+  content_type :json
+
+  if current_user.questions.include?(question)
+    question.get_pin_data.to_json
+    # json[:user_pin] = question.get_pin_data
+  else
+    question.to_json
   end
 end
 

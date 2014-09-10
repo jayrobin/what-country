@@ -11,14 +11,21 @@ class User < ActiveRecord::Base
     (Question.all - questions).sample
   end
 
-  def get_unanswered_questions_as_json
-    json = []
+  def get_questions_as_json
+    json = {}
+    json[:questions] = []
+
     Category.all.each do |category|
       questions = []
       category.questions.each do |question|
         questions << { id: question.id, content: question.content }
       end
-      json << { category: category.name, questions: questions }
+      json[:questions] << { category: category.name, questions: questions }
+    end
+
+    json[:answered] = []
+    pins.each do |pin|
+      json[:answered] << { question_id: pin.question_id }
     end
 
     json.to_json

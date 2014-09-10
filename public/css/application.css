@@ -67,3 +67,7 @@ html, body, main {
   font-size: bold;
   background-color: #95a5a6;
 }
+
+.answered {
+  text-decoration: line-through;
+}

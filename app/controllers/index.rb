@@ -28,7 +28,7 @@ end
 get '/question' do
   content_type :json
 
-  current_user.get_unanswered_questions_as_json
+  current_user.get_questions_as_json
 end
 
 get '/question/random' do

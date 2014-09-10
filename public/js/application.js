@@ -67,6 +67,7 @@ var placeMarker = function(pinLoc) {
     userMarker = addPin(pinLoc);
     userMarker.setAnimation(google.maps.Animation.BOUNCE);
     var questionID = $("#question").data("id");
+    setQuestionAnswered(questionID);
     $.ajax({
       type: "post",
       url: "question/" + questionID + "/pin/new",
@@ -74,6 +75,10 @@ var placeMarker = function(pinLoc) {
       timeout: 10000
     }).done(handleAddPinResponse).fail(resetMap)
   }
+}
+
+var setQuestionAnswered = function(id) {
+  $("#" + id).css("text-decoration", "line-through");//addClass("answered");
 }
 
 var getUserLocation = function() {
@@ -135,13 +140,25 @@ var handleNextQuestionResponse = function(result) {
 }
 
 var handleGetAllQuestionsResponse = function(result) {
-  for(var i = 0; i < result.length; i++) {
-    var category = result[i];
+  var questions = result.questions;
+  var answered = result.answered;
+
+  for(var i = 0; i < questions.length; i++) {
+    var category = questions[i];
     addCategoryHTML(category);
   }
   $("#categories").accordion({
     heightStyle: "content"
   });
+
+  console.log(answered);
+  for(var j = 0; j < answered.length; j++) {
+    var question_id = answered[j].question_id;
+    console.log(question_id);
+    setQuestionAnswered(question_id);
+  }
+
+  highlightLoadedQuestion();
 
   $("#categories").on("click", function(ev) {
     if($(ev.target).attr("class") === "question") {
@@ -152,6 +169,13 @@ var handleGetAllQuestionsResponse = function(result) {
       }).done(handleGetQuestionResponse);
     }
   });
+}
+
+var highlightLoadedQuestion = function() {
+  var question_id = $("#question").data("id");
+  var question = $("#" + question_id);
+  question.addClass("selected")
+  question.parent().prev().click();
 }
 
 var handleGetQuestionResponse = function(result) {

@@ -143,20 +143,23 @@ var handleGetAllQuestionsResponse = function(result) {
   var questions = result.questions;
   var answered = result.answered;
 
+  var numQuestions = 0;
   for(var i = 0; i < questions.length; i++) {
     var category = questions[i];
     addCategoryHTML(category);
+    numQuestions += category.questions.length;
   }
   $("#categories").accordion({
     heightStyle: "content"
   });
 
-  console.log(answered);
   for(var j = 0; j < answered.length; j++) {
     var question_id = answered[j].question_id;
-    console.log(question_id);
     setQuestionAnswered(question_id);
   }
+
+  var ratio = answered.length + " / " + numQuestions;
+  $("#category_panel > h3").text("Questions " + ratio);
 
   highlightLoadedQuestion();
 

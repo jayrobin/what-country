@@ -1,58 +1,11 @@
-def get_random_pos
-	{x: rand(-180..180), y: rand(-85..85)}
-end
+require_relative 'question_loader'
+
 
 Category.delete_all
 Question.delete_all
 Pin.delete_all
 
-
-cat1 = Category.create(name: "food")
-cat1.questions.create(content: "What country has the best food?")
-cat1.questions.create(content: "What country has the best beer?")
-
-cat2 = Category.create(name: "people")
-cat2.questions.create(content: "What country has the least attractive people?")
-cat2.questions.create(content: "What country has the worst tourists?")
-
-# Question ideas
-
-# sports
-	# What country is the best at sports?
-	# What country is the best at soccer?
-	# What country is the best at sports?
-
-# food/drink
-	# What country has the best food?
-	# What country has the worst food?
-	# What country has the best beer?
-	# What country drinks the most alcohol?
-
-# people
-	# What country has the worst tourists?
-	# What country has the most attractive people?
-	# What country has the least attractive people?
-	# What country has the best accent?
-	# What country has the worst accent?
-	# What country has the friendliest people?
-
-# places
-	# What country has the best beaches?
-	# What country has the best scenery?
-
-# misc
-	# What country smells the worst?
-	# What country would win in a free-for-all?
-	# What country has the best education?
-	# What country will be the world leader in fifty years?
-	# What country has the worst drivers?
-	# What country is most responsible for all the world's problems?
-
-# personal
-	# What country would you most like to live in?
-	# What country would you send your worst enemy to live out their last days?
-	# What country did you last visit?
-
+QuestionLoader.load("./db/questions.yml")
 # User.delete_all
 # (1..100).each do |i|
 # 	User.create(username: i)
@@ -65,4 +18,8 @@ cat2.questions.create(content: "What country has the worst tourists?")
 # 		pin = question.pins.create(get_random_pos)
 # 		user.pins << pin
 # 	end
+# end
+
+# def get_random_pos
+# 	{x: rand(-180..180), y: rand(-85..85)}
 # end

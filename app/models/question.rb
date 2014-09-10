@@ -10,4 +10,10 @@ class Question < ActiveRecord::Base
   def get_pin_data
     { id: id, content: content, pins: pins.map { |pin| { x: pin.x, y: pin.y } } }
   end
+
+  def get_pin_data_for_user(user_id)
+    pin = pins.where(user_id: user_id).first
+
+    pin.nil? ? {} : { x: pin.x, y: pin.y }
+  end
 end

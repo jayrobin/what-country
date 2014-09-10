@@ -1,0 +1,36 @@
+---
+- category: food and drink
+  questions:
+            - What country has the best food?
+            - What country has the worst food?
+            - What country has the best beer?
+            - What country drinks the most?
+- category: people
+  questions:
+            - What country has the worst tourists?
+            - What country has the most attractive people?
+            - What country has the least attractive people?
+            - What country has the best accent?
+            - What country has the worst accent?
+            - What country has the friendliest people?
+- category: personal
+  questions:
+            - What country would you most like to live in?
+            - What country would you send your worst enemy to?
+            - What country did you last visit?
+- category: places
+  questions:
+            - What country has the best beaches?
+            - What country has the best scenery?
+- category: sports
+  questions:
+            - What country is the best at sports?
+            - What country is the best at soccer?
+- category: misc
+  questions:
+            - What country smells the worst?
+            - What country would win in a free-for-all?
+            - What country has the best education?
+            - What country will be the world leader in fifty years?
+            - What country has the worst drivers?
+            - What country is most responsible for all the world's problems?

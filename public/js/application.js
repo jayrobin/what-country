@@ -5,9 +5,10 @@ var markerPlaced = false;
 var userLocation;
 var userMarker;
 
-var categoryTemplate =  "<div id='category_{{category}}' class='category'>" +
-                        "<h4>{{category}}</h4>" +
-                        "</div>"
+// var categoryTemplate =  "<div id='category_{{category}}' class='category'>" +
+var categoryTemplate =  "<h3>{{category}}</h3>" +
+                        "<div></div>"
+                        // "</div>"
 
 
 var questionTemplate =  "<a id='{{id}}' class='question'>{{content}}</a>"
@@ -65,7 +66,7 @@ var placeMarker = function(pinLoc) {
     centerMapOnLocation(pinLoc);
     userMarker = addPin(pinLoc);
     userMarker.setAnimation(google.maps.Animation.BOUNCE);
-    var questionID = $("#question span").attr("id");
+    var questionID = $("#question").data("id");
     $.ajax({
       type: "post",
       url: "question/" + questionID + "/pin/new",
@@ -127,8 +128,8 @@ var handleNextQuestionResponse = function(result) {
     $("main").empty();
   }
   else {
-    $("#question span").attr("id", result.id);
-    $("#question span").html(result.content);
+    $("#question").data("id", result.id);
+    $("#question").html(result.content);
     resetMap();
   }
 }
@@ -138,8 +139,11 @@ var handleGetAllQuestionsResponse = function(result) {
     var category = result[i];
     addCategoryHTML(category);
   }
+  $("#categories").accordion({
+    heightStyle: "content"
+  });
 
-  $("#category_list").on("click", function(ev) {
+  $("#categories").on("click", function(ev) {
     if($(ev.target).attr("class") === "question") {
       var questionID = ev.target.id;
       $.ajax({
@@ -155,14 +159,19 @@ var handleGetQuestionResponse = function(result) {
     $("main").empty();
   }
   else {
-    $("#question span").attr("id", result.id);
-    $("#question span").html(result.content);
+    $("#question").data("id", result.id);
+    $("#question").html(result.content);
+    $(".question").removeClass("selected");
+    $("#" + result.id).addClass("selected");
     resetMap();
-    console.log(result);
     if(result.pins) {
       // render heatmap
       pins = converJSONtoPins(result.pins);
       renderHeatMap(pins);
+
+      var pinLoc = new google.maps.LatLng(result.user_pin.x, result.user_pin.y);
+      addPin(pinLoc);
+      centerMapOnLocation(pinLoc);
       markerPlaced = true;
     }
     else {
@@ -173,12 +182,12 @@ var handleGetQuestionResponse = function(result) {
 
 var addCategoryHTML = function(category) {
   var categoryHTML = $(Mustache.to_html(categoryTemplate, category));
-  $("#category_list").append(categoryHTML);
+  $("#categories").append(categoryHTML);
 
   for(var i = 0; i < category.questions.length; i++) {
     var question = category.questions[i];
     var questionHTML = Mustache.to_html(questionTemplate, question);
-    categoryHTML.append(questionHTML);
+    categoryHTML.next().append(questionHTML);
   }
 }
 

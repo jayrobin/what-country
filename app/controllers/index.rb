@@ -48,8 +48,9 @@ get '/question/:id' do
   content_type :json
 
   if current_user.questions.include?(question)
-    question.get_pin_data.to_json
-    # json[:user_pin] = question.get_pin_data
+    pin_data = question.get_pin_data
+    pin_data[:user_pin] = question.get_pin_data_for_user(current_user.id)
+    pin_data.to_json
   else
     question.to_json
   end

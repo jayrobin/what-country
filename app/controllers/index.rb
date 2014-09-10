@@ -16,7 +16,19 @@ post '/question/:id/pin/new' do
     current_user.pins << @pin
 
     content_type :json
-    @question.get_pin_data.to_json
+    @question.get_pin_data(@pin).to_json
+  end
+end
+
+put '/question/:id/pin/' do
+  @question = Question.find(params[:id])
+  @pin = @question.pins.where(user_id: current_user.id).first
+  p @pin
+  p params
+  unless @pin.nil?
+    @pin.x = params[:x]
+    @pin.y = params[:y]
+    @pin.save!
   end
 end
 

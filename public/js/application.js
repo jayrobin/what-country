@@ -32,6 +32,7 @@ function createMap() {
 var addPin = function(pinLoc) {
   var marker = new google.maps.Marker({
     position: pinLoc,
+    draggable: true,
     map: map
   });
   allPins.push(marker);
@@ -65,8 +66,9 @@ var placeMarker = function(pinLoc) {
     markerPlaced = true;
     centerMapOnLocation(pinLoc);
     userMarker = addPin(pinLoc);
+    google.maps.event.addListener(userMarker, 'dragend', updateMarker);
     userMarker.setAnimation(google.maps.Animation.BOUNCE);
-    var questionID = $("#question").data("id");
+    var questionID = getQuestionID();
     setQuestionAnswered(questionID);
     $.ajax({
       type: "post",
@@ -77,8 +79,21 @@ var placeMarker = function(pinLoc) {
   }
 }
 
+var updateMarker = function(ev) {
+  $.ajax({
+      type: "put",
+      url: "question/" + getQuestionID() + "/pin/",
+      data: {x: ev.latLng.k, y: ev.latLng.B},
+      timeout: 10000
+    })
+}
+
+var getQuestionID = function() {
+  return $("#question").data("id");
+}
+
 var setQuestionAnswered = function(id) {
-  $("#" + id).css("text-decoration", "line-through");//addClass("answered");
+  $("#" + id).css("text-decoration", "line-through");
 }
 
 var getUserLocation = function() {
@@ -126,6 +141,7 @@ var handleAddPinResponse = function(result) {
   pins = converJSONtoPins(result.pins);
   renderHeatMap(pins);
   userMarker.setAnimation(null);
+  hideLoadOverlay();
 }
 
 var handleNextQuestionResponse = function(result) {
@@ -137,6 +153,7 @@ var handleNextQuestionResponse = function(result) {
     $("#question").html(result.content);
     resetMap();
   }
+  hideLoadOverlay();
 }
 
 var handleGetAllQuestionsResponse = function(result) {
@@ -165,6 +182,7 @@ var handleGetAllQuestionsResponse = function(result) {
 
   $("#categories").on("click", function(ev) {
     if($(ev.target).attr("class") === "question") {
+      // showLoadOverlay();
       var questionID = ev.target.id;
       $.ajax({
         url: "/question/" + questionID,
@@ -179,6 +197,7 @@ var highlightLoadedQuestion = function() {
   var question = $("#" + question_id);
   question.addClass("selected")
   question.parent().prev().click();
+  hideLoadOverlay();
 }
 
 var handleGetQuestionResponse = function(result) {
@@ -197,13 +216,15 @@ var handleGetQuestionResponse = function(result) {
       renderHeatMap(pins);
 
       var pinLoc = new google.maps.LatLng(result.user_pin.x, result.user_pin.y);
-      addPin(pinLoc);
+      userPin = addPin(pinLoc);
+      google.maps.event.addListener(userPin, 'dragend', updateMarker);
       centerMapOnLocation(pinLoc);
       markerPlaced = true;
     }
     else {
       // allow pin placement
     }
+    hideLoadOverlay();
   }
 }
 
@@ -242,6 +263,7 @@ var resetHeatmap = function() {
 var bindEventListeners = function() {
   $("#next-question").on("click", function(e) {
     e.preventDefault();
+    // showLoadOverlay();
     $.ajax({
       url: "/question/random",
       type: "get"
@@ -250,10 +272,21 @@ var bindEventListeners = function() {
 }
 
 var loadQuestions = function() {
+  // showLoadOverlay();
   $.ajax({
     url: "/question",
     type: "get"
   }).done(handleGetAllQuestionsResponse);
+}
+
+var hideLoadOverlay = function() {
+  $("#load_container").hide();
+}
+
+var showLoadOverlay = function() {
+  var $overlay = $("#load_container")
+  $overlay.find("h1").text(LoadMessager.getRandomLoadMessage());
+  $overlay.show();
 }
 
 $(document).ready(function() {

@@ -20,13 +20,7 @@ end
 put '/question/:id/pin/' do
   @question = Question.find(params[:id])
   @pin = @question.pins.where(user_id: current_user.id).first
-  p @pin
-  p params
-  unless @pin.nil?
-    @pin.x = params[:x]
-    @pin.y = params[:y]
-    @pin.save!
-  end
+  @pin.update_position(params) unless @pin.nil?
 end
 
 get '/all' do
@@ -63,13 +57,6 @@ get '/question/:id' do
   else
     question.to_json
   end
-end
-
-get '/question/:id/next' do
-  # question = Question.find(params[:id])
-  current_user.get_next_unanswered_question(params[:id])
-  content_type :json
-
 end
 
 post '/user/new' do

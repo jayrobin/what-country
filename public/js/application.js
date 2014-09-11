@@ -5,13 +5,8 @@ var markerPlaced = false;
 var userLocation;
 var userMarker;
 
-// var categoryTemplate =  "<div id='category_{{category}}' class='category'>" +
-var categoryTemplate =  "<h3>{{category}}</h3>" +
-                        "<div></div>"
-                        // "</div>"
-
-
-var questionTemplate =  "<a id='{{id}}' class='question'>{{content}}</a>"
+var categoryTemplate =  "<h3>{{category}}</h3><div></div>";
+var questionTemplate =  "<a id='{{id}}' class='question'>{{content}}</a>";
 
 function createMap() {
   var mapOptions =
@@ -80,12 +75,18 @@ var placeMarker = function(pinLoc) {
 }
 
 var updateMarker = function(ev) {
+  userMarker.setAnimation(google.maps.Animation.BOUNCE);
+
   $.ajax({
-      type: "put",
-      url: "question/" + getQuestionID() + "/pin/",
-      data: {x: ev.latLng.k, y: ev.latLng.B},
-      timeout: 10000
-    })
+    type: "put",
+    url: "question/" + getQuestionID() + "/pin/",
+    data: {x: ev.latLng.k, y: ev.latLng.B},
+    timeout: 10000
+  }).done(handleMarkerUpdatedResponse);
+}
+
+var handleMarkerUpdatedResponse = function() {
+  userMarker.setAnimation(null);
 }
 
 var getQuestionID = function() {
@@ -93,7 +94,6 @@ var getQuestionID = function() {
 }
 
 var setQuestionAnswered = function(id) {
-  // $("#" + id).css("text-decoration", "line-through");
   $("#" + id).addClass("answered");
 }
 
@@ -218,8 +218,8 @@ var handleGetQuestionResponse = function(result) {
       renderHeatMap(pins);
 
       var pinLoc = new google.maps.LatLng(result.user_pin.x, result.user_pin.y);
-      userPin = addPin(pinLoc);
-      google.maps.event.addListener(userPin, 'dragend', updateMarker);
+      userMarker = addPin(pinLoc);
+      google.maps.event.addListener(userMarker, 'dragend', updateMarker);
       centerMapOnLocation(pinLoc);
       markerPlaced = true;
     }
@@ -272,7 +272,6 @@ var getNextQuestionID = function() {
 
   var nextQuestionID = min + (((currentQuestionID-min) + 1) % (numQuestions + 1));
   while(nextQuestionID != currentQuestionID) {
-    console.log(nextQuestionID);
     var $question = $("#" + nextQuestionID);
 
     if($question.hasClass("question") && !$question.hasClass("answered")) {

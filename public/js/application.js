@@ -4,6 +4,8 @@ var allPins = [];
 var markerPlaced = false;
 var userLocation;
 var userMarker;
+var numAnswered = 0;
+var numQuestions = 0;
 
 var categoryTemplate =  "<h3>{{category}}</h3><div></div>";
 var questionTemplate =  "<a id='{{id}}' class='question'>{{content}}</a>";
@@ -58,6 +60,9 @@ var converJSONtoPins = function(json) {
 
 var placeMarker = function(pinLoc) {
   if(!markerPlaced) {
+    numAnswered++;
+    updateNumAnswered();
+
     markerPlaced = true;
     centerMapOnLocation(pinLoc);
     userMarker = addPin(pinLoc);
@@ -160,8 +165,9 @@ var handleNextQuestionResponse = function(result) {
 var handleGetAllQuestionsResponse = function(result) {
   var questions = result.questions;
   var answered = result.answered;
+  numAnswered = answered.length;
 
-  var numQuestions = 0;
+  numQuestions = 0;
   for(var i = 0; i < questions.length; i++) {
     var category = questions[i];
     addCategoryHTML(category);
@@ -171,27 +177,29 @@ var handleGetAllQuestionsResponse = function(result) {
     heightStyle: "content"
   });
 
-  for(var j = 0; j < answered.length; j++) {
+  for(var j = 0; j < numAnswered; j++) {
     var question_id = answered[j].question_id;
     setQuestionAnswered(question_id);
   }
 
-  var ratio = answered.length + " / " + numQuestions;
-  $("#category_panel > h3").text("Questions " + ratio);
+  updateNumAnswered();
 
   var question_id = $("#question").data("id");
   highlightQuestion(question_id);
 
   $("#categories").on("click", "a", function(ev) {
-    // if($(ev.target).attr("class") === "question") {
-      // showLoadOverlay();
-      var questionID = ev.target.id;
-      $.ajax({
-        url: "/question/" + questionID,
-        type: "get"
-      }).done(handleGetQuestionResponse);
-    // }
+    // showLoadOverlay();
+    var questionID = ev.target.id;
+    $.ajax({
+      url: "/question/" + questionID,
+      type: "get"
+    }).done(handleGetQuestionResponse);
   });
+}
+
+var updateNumAnswered = function() {
+  var ratio = numAnswered + " / " + numQuestions;
+  $("#category_panel > h3").text(ratio + " questions");
 }
 
 var highlightQuestion = function(id) {

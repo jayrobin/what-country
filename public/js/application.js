@@ -64,6 +64,8 @@ var placeMarker = function(pinLoc) {
     numAnswered++;
     updateNumAnswered();
 
+    $("#instructions").html("Drag the pin to change your answer");
+
     markerPlaced = true;
     centerMapOnLocation(pinLoc);
     userMarker = addPin(pinLoc);
@@ -208,7 +210,7 @@ var handleGetAllQuestionsResponse = function(result) {
 
 var updateNumAnswered = function() {
   var ratio = numAnswered + " / " + numQuestions;
-  $("#category_panel > h3").text(ratio + " questions");
+  $("#category_panel > h3").text(ratio + " answered");
 }
 
 var highlightQuestion = function(id) {
@@ -229,6 +231,8 @@ var handleGetQuestionResponse = function(result) {
     $("#" + result.id).addClass("selected");
     resetMap();
     if(result.pins) {
+      $("#instructions").html("Drag the pin to change your answer");
+
       // render heatmap
       pins = converJSONtoPins(result.pins);
       renderHeatMap(pins);
@@ -240,7 +244,7 @@ var handleGetQuestionResponse = function(result) {
       markerPlaced = true;
     }
     else {
-      // allow pin placement
+      $("#instructions").html("Click on a country to answer");
     }
     hideLoadOverlay();
   }

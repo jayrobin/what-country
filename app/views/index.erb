@@ -1,19 +1,26 @@
 <main>
-	<div id="google_map" ></div>
-	<div class="page_header" id="question_container">
-		<h2 id="question" data-id="<%= @question.id %>"><%= @question.content %></h2>
-	</div>
-
-  <div id="category_panel">
-    <h3>Questions</h3>
-    <button type="button" class="btn btn-default" id="next-question">Next question</button>
-    <div id="categories">
-
+  <div class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header" id="question_container">
+        <h2 id="question" data-id="<%= @question.id %>"><%= @question.content %></h2>
+        <span id="instructions">Click on a country to answer</span>
+      </div>
     </div>
   </div>
 
-  <div id="load_container" class="origin full_size">
+  <div id="interaction_container">
+	  <div id="category_panel">
+	    <h3>Loading questions</h3>
+	    <button type="button" class="btn btn-success" id="next-question">Next question</button>
+	    <div id="categories"></div>
+	  </div>
+
+		<div id="google_map" ></div>
+	</div>
+
+
+<!--   <div id="load_container" class="origin full_size">
   	<div class="transparent_black origin full_size"></div>
   	<div id="load_message"><h1></h1></div>
-  </div>
+  </div> -->
 </main>

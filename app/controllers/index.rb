@@ -62,3 +62,10 @@ end
 post '/user/new' do
   find_or_create_user
 end
+
+get '/user/new/force' do
+  session[:id] = nil
+  session.clear
+  force_create_user
+  redirect '/'
+end

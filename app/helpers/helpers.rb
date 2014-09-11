@@ -12,3 +12,8 @@ def find_or_create_user
   user.set_location(params[:location]) if params[:location]
   user
 end
+
+def force_create_user
+  user = User.create(username: SecureRandom.hex)
+  session[:id] = user.id
+end

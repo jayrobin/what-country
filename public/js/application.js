@@ -13,15 +13,13 @@ var questionTemplate =  "<a id='{{id}}' class='question'>{{content}}</a>";
 function createMap() {
   var mapOptions =
   {
-    scrollwheel: false,
-    disableDoubleClickZoom: true,
     center: new google.maps.LatLng(40, -100),
     zoom: 2,
     disableDefaultUI: true,
     zoomControl: true
   };
+
   map = new google.maps.Map(document.getElementById("google_map"), mapOptions);
-  getUserLocation();
   google.maps.event.addListener(map, 'click', function(event) {
     placeMarker(event.latLng);
   });
@@ -110,7 +108,6 @@ var getUserLocation = function() {
     userLocation = new google.maps.LatLng(position.coords.latitude,
                                           position.coords.longitude);
 
-    centerMapOnLocation(userLocation);
     getLocationDetails(userLocation);
   });
 }
@@ -150,7 +147,7 @@ var handleAddPinResponse = function(result) {
   pins = converJSONtoPins(result.pins);
   renderHeatMap(pins);
   userMarker.setAnimation(null);
-  hideLoadOverlay();
+  // hideLoadOverlay();
 }
 
 var handleNextQuestionResponse = function(result) {
@@ -162,7 +159,7 @@ var handleNextQuestionResponse = function(result) {
     $("#question").html(result.content);
     resetMap();
   }
-  hideLoadOverlay();
+  // hideLoadOverlay();
 }
 
 var handleGetAllQuestionsResponse = function(result) {
@@ -217,7 +214,7 @@ var highlightQuestion = function(id) {
   var question = $("#" + id);
   question.addClass("selected");
   question.parent().prev().click();
-  hideLoadOverlay();
+  // hideLoadOverlay();
 }
 
 var handleGetQuestionResponse = function(result) {
@@ -246,7 +243,7 @@ var handleGetQuestionResponse = function(result) {
     else {
       $("#instructions").html("Click on a country to answer");
     }
-    hideLoadOverlay();
+    // hideLoadOverlay();
   }
 }
 
@@ -313,6 +310,7 @@ var bindEventListeners = function() {
     var nextQuestionID = getNextQuestionID();
     $("#" + nextQuestionID).click();
     highlightQuestion(nextQuestionID);
+    showGeolocateDialog();
   });
 }
 
@@ -330,12 +328,61 @@ var hideLoadOverlay = function() {
 
 var showLoadOverlay = function() {
   var $overlay = $("#load_container")
-  $overlay.find("h1").text(LoadMessager.getRandomLoadMessage());
+  // $overlay.find("h1").text(LoadMessager.getRandomLoadMessage());
   $overlay.show();
+}
+
+var createGeolocateDialog = function() {
+  $locate_dialog = $( "#locate_dialog" );
+  $locate_dialog.dialog({
+    open: function(event, ui) { $(".ui-dialog-titlebar-close").hide(); }
+  });
+  $locate_dialog.find("#locate_true").on("click", handleLocateTrueClicked);
+  $locate_dialog.find("#locate_false").on("click", handleLocateFalseClicked);
+  hideGeolocateDialog();
+}
+
+var showGeolocateDialog = function() {
+  if(!isLocateCookieSet()) {
+    showLoadOverlay();
+    $("#locate_dialog").dialog("open");
+    setLocateCookie();
+  }
+}
+
+var setLocateCookie = function() {
+  var date = new Date();
+  date.setTime(date.getTime()+(30*24*60*60*1000)); // expire after 30 days
+  var expires = "; expires=" + date.toGMTString();
+  document.cookie = "locateShown=true" + expires + "; path=/";
+}
+
+var isLocateCookieSet = function() {
+  if(document.cookie == undefined || document.cookie.split("=")[1] != "true") {
+    return false;
+  }
+  else {
+    return true;
+  }
+}
+
+var hideGeolocateDialog = function() {
+  hideLoadOverlay();
+  $("#locate_dialog").dialog("close");
+}
+
+var handleLocateFalseClicked = function() {
+  hideGeolocateDialog();
+}
+
+var handleLocateTrueClicked = function() {
+  getUserLocation();
+  hideGeolocateDialog();
 }
 
 $(document).ready(function() {
   bindEventListeners();
   createMap();
   loadQuestions();
+  createGeolocateDialog();
 });

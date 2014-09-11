@@ -1,10 +1,9 @@
 ---
-- category: food and drink
+- category: personal
   questions:
-            - What country has the best food?
-            - What country has the worst food?
-            - What country has the best beer?
-            - What country drinks the most?
+            - What country would you most like to live in?
+            - What country would you send your worst enemy to?
+            - What country did you last visit?
 - category: people
   questions:
             - What country has the worst tourists?
@@ -13,24 +12,27 @@
             - What country has the best accent?
             - What country has the worst accent?
             - What country has the friendliest people?
-- category: personal
+            - What country has the worst drivers?
+            - What country would win in a free-for-all?
+- category: food and drink
   questions:
-            - What country would you most like to live in?
-            - What country would you send your worst enemy to?
-            - What country did you last visit?
+            - What country has the best food?
+            - What country has the worst food?
+            - What country has the best beer?
+            - What country drinks the most?
 - category: places
   questions:
             - What country has the best beaches?
             - What country has the best scenery?
+            - What country smells the worst?
+            - What country has the best education?
 - category: sports
   questions:
             - What country is the best at sports?
             - What country is the best at soccer?
-- category: misc
+            - What country had the best Olympics opening ceremony?
+- category: history
   questions:
-            - What country smells the worst?
-            - What country would win in a free-for-all?
-            - What country has the best education?
-            - What country will be the world leader in fifty years?
-            - What country has the worst drivers?
+            - What country contributed the most in World War 2?
             - What country is most responsible for all the world's problems?
+            - What country will be the world leader in fifty years?

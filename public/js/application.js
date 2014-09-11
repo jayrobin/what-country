@@ -178,6 +178,14 @@ var handleGetAllQuestionsResponse = function(result) {
     heightStyle: "content"
   });
 
+  if(numQuestions == numAnswered) {
+    var questionID = getQuestionID();
+    $.ajax({
+      url: "/question/" + questionID,
+      type: "get"
+    }).done(handleGetQuestionResponse);
+  }
+
   for(var j = 0; j < numAnswered; j++) {
     var question_id = answered[j].question_id;
     setQuestionAnswered(question_id);
@@ -204,7 +212,6 @@ var updateNumAnswered = function() {
 }
 
 var highlightQuestion = function(id) {
-  
   var question = $("#" + id);
   question.addClass("selected");
   question.parent().prev().click();

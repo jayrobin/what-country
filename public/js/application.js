@@ -301,17 +301,20 @@ var getNextQuestionID = function() {
   return min + (((nextQuestionID-min) + 1) % (numQuestions + 1));
 }
 
+var handleNextQuestionClick = function(e) {
+  e.preventDefault();
+
+  $("#" + getQuestionID()).removeClass("selected");
+
+  var nextQuestionID = getNextQuestionID();
+  $("#" + nextQuestionID).click();
+  highlightQuestion(nextQuestionID);
+  showGeolocateDialog();
+}
+
 var bindEventListeners = function() {
-  $("#next-question").on("click", function(e) {
-    e.preventDefault();
-
-    $("#" + getQuestionID()).removeClass("selected");
-
-    var nextQuestionID = getNextQuestionID();
-    $("#" + nextQuestionID).click();
-    highlightQuestion(nextQuestionID);
-    showGeolocateDialog();
-  });
+  $("#next-question").on("click", handleNextQuestionClick);
+  $("#next-question-full").on("click", handleNextQuestionClick);
 }
 
 var loadQuestions = function() {

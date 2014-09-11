@@ -11,10 +11,6 @@ a.question {
   color: #7f8c8d;
 }
 
-#question {
-  /*width: 70%;*/
-}
-
 #instructions {
   position: absolute;
   right: 20px;
@@ -222,4 +218,45 @@ footer nav li a:hover {
 }
 #locate_true {
   margin-left: 10%;
+}
+
+.next-question-full {
+  display: none;
+}
+
+@media all and (min-width: 320px) and (max-width: 780px) {
+  #question_container > h2 {
+    width: 100%;
+  }
+
+  #instructions {
+    display: none;
+  }
+
+  .next-question-full {
+    width: 96%;
+    margin-left: 2%;
+    display: block;
+    position: relative;
+    top: -70px;
+  }
+
+  div#category_panel {
+    display: none;
+  }
+
+  footer {
+    display: none;
+  }
+
+  #google_map {
+    width: 96%;
+    margin-left: 2%;
+  }
+
+  #interaction_container {
+    margin-bottom: 20px;
+  }
+
+
 }

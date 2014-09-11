@@ -17,7 +17,8 @@ function createMap() {
     disableDoubleClickZoom: true,
     center: new google.maps.LatLng(40, -100),
     zoom: 2,
-    disableDefaultUI: true
+    disableDefaultUI: true,
+    zoomControl: true
   };
   map = new google.maps.Map(document.getElementById("google_map"), mapOptions);
   getUserLocation();

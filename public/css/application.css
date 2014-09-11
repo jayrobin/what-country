@@ -91,7 +91,7 @@ a.question {
   border: 1px dotted black;
 }
 
-.selected {
+a.selected {
   font-size: bold;
   color: #c0392b;
 }

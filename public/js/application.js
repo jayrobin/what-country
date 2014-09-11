@@ -346,26 +346,10 @@ var createGeolocateDialog = function() {
 }
 
 var showGeolocateDialog = function() {
-  if(!isLocateCookieSet()) {
+  if(!CookieManager.isLocateCookieSet()) {
     showLoadOverlay();
     $("#locate_dialog").dialog("open");
-    setLocateCookie();
-  }
-}
-
-var setLocateCookie = function() {
-  var date = new Date();
-  date.setTime(date.getTime()+(30*24*60*60*1000)); // expire after 30 days
-  var expires = "; expires=" + date.toGMTString();
-  document.cookie = "locateShown=true" + expires + "; path=/";
-}
-
-var isLocateCookieSet = function() {
-  if(document.cookie == undefined || document.cookie.split("=")[1] != "true") {
-    return false;
-  }
-  else {
-    return true;
+    CookieManager.setLocateCookie();
   }
 }
 

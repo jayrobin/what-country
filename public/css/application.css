@@ -2,13 +2,13 @@ body, main {
 	background-color: #2c3e50;
 }
 
-a {
+a.question {
   color: #7f8c8d;
 }
 
 #interaction_container > div {
   display: inline-block;
-  margin-bottom: 20px;
+  margin-bottom: 70px;
 }
 
 #google_map {
@@ -132,4 +132,53 @@ a {
 
 #load_container {
   display: none;
+}
+
+footer {
+  background-color: black;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 50px;
+  left: 0;
+}
+
+footer ul {
+  text-align: center;
+}
+
+footer li {
+  color: #fff;
+  display: inline-block;
+  font-size: 1.8em;
+  margin: 10px;
+}
+
+footer li a {
+  color: #fff;
+  opacity: 0.3;
+  transition: opacity 0.5s ease;  
+}
+
+footer nav li a:hover {
+  color: #fff;
+  opacity: 1.0;
+}
+
+/*font and icons*/
+@font-face {
+  font-family: 'IcoMoon';
+  src: url('../font/icomoon.woff') format('woff');
+}
+
+[data-icon]:before {
+  font-family: 'IcoMoon';
+  content: attr(data-icon);
+}
+
+/*accessibility*/
+.screen-reader {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
 }

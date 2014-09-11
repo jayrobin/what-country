@@ -1,10 +1,7 @@
 get '/' do
-  @question = current_user.get_unanswered_question
-  if @question
-    erb :index
-  else
-    # GAME OVER
-  end
+  @question = current_user.get_unanswered_question || Question.get_random_question()
+
+  erb :index
 end
 
 post '/question/:id/pin/new' do
@@ -66,6 +63,13 @@ get '/question/:id' do
   else
     question.to_json
   end
+end
+
+get '/question/:id/next' do
+  # question = Question.find(params[:id])
+  current_user.get_next_unanswered_question(params[:id])
+  content_type :json
+
 end
 
 post '/user/new' do

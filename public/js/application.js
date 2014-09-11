@@ -93,7 +93,8 @@ var getQuestionID = function() {
 }
 
 var setQuestionAnswered = function(id) {
-  $("#" + id).css("text-decoration", "line-through");
+  // $("#" + id).css("text-decoration", "line-through");
+  $("#" + id).addClass("answered");
 }
 
 var getUserLocation = function() {
@@ -178,24 +179,25 @@ var handleGetAllQuestionsResponse = function(result) {
   var ratio = answered.length + " / " + numQuestions;
   $("#category_panel > h3").text("Questions " + ratio);
 
-  highlightLoadedQuestion();
+  var question_id = $("#question").data("id");
+  highlightQuestion(question_id);
 
-  $("#categories").on("click", function(ev) {
-    if($(ev.target).attr("class") === "question") {
+  $("#categories").on("click", "a", function(ev) {
+    // if($(ev.target).attr("class") === "question") {
       // showLoadOverlay();
       var questionID = ev.target.id;
       $.ajax({
         url: "/question/" + questionID,
         type: "get"
       }).done(handleGetQuestionResponse);
-    }
+    // }
   });
 }
 
-var highlightLoadedQuestion = function() {
-  var question_id = $("#question").data("id");
-  var question = $("#" + question_id);
-  question.addClass("selected")
+var highlightQuestion = function(id) {
+  
+  var question = $("#" + id);
+  question.addClass("selected");
   question.parent().prev().click();
   hideLoadOverlay();
 }
@@ -260,14 +262,38 @@ var resetHeatmap = function() {
   }
 }
 
+var getNextQuestionID = function() {
+  var currentQuestionID = getQuestionID();
+
+  $questions = $("#category_panel a.question");
+  var min = parseInt($questions.first().attr("id"), 10);
+  var max = parseInt($questions.last().attr("id"), 10);
+  var numQuestions = max - min;
+
+  var nextQuestionID = min + (((currentQuestionID-min) + 1) % (numQuestions + 1));
+  while(nextQuestionID != currentQuestionID) {
+    console.log(nextQuestionID);
+    var $question = $("#" + nextQuestionID);
+
+    if($question.hasClass("question") && !$question.hasClass("answered")) {
+      return nextQuestionID;
+    }
+
+    nextQuestionID = min + (((nextQuestionID-min) + 1) % (numQuestions + 1));
+  }
+
+  return min + (((nextQuestionID-min) + 1) % (numQuestions + 1));
+}
+
 var bindEventListeners = function() {
   $("#next-question").on("click", function(e) {
     e.preventDefault();
-    // showLoadOverlay();
-    $.ajax({
-      url: "/question/random",
-      type: "get"
-    }).done(handleNextQuestionResponse);
+
+    $("#" + getQuestionID()).removeClass("selected");
+
+    var nextQuestionID = getNextQuestionID();
+    $("#" + nextQuestionID).click();
+    highlightQuestion(nextQuestionID);
   });
 }
 

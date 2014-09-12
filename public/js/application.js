@@ -2,7 +2,6 @@ var map;
 var heatmap;
 var allPins = [];
 var markerPlaced = false;
-var userLocation;
 var userMarker;
 var numAnswered = 0;
 var numQuestions = 0;
@@ -101,42 +100,6 @@ var getQuestionID = function() {
 
 var setQuestionAnswered = function(id) {
   $("#" + id).addClass("answered");
-}
-
-var getUserLocation = function() {
-  navigator.geolocation.getCurrentPosition(function(position) {
-    userLocation = new google.maps.LatLng(position.coords.latitude,
-                                          position.coords.longitude);
-
-    getLocationDetails(userLocation);
-  });
-}
-
-var getLocationDetails = function(location) {
-  $.ajax({
-    type: "get",
-    url: "http://maps.googleapis.com/maps/api/geocode/json?latlng=" + location.k + "," + location.B + "&sensor=false"
-  }).done(handleGeocodeResponse);
-}
-
-var handleGeocodeResponse = function(result) {
-  var address_data = result.results[0].address_components;
-  var country = getCountryFromGeocodeAddress(address_data);
-  var state = getProvinceFromGMapsGeocodeAddress(address_data);
-
-  $.ajax({
-    type: "post",
-    url: "user/new",
-    data: {location: {x: userLocation.k, y: userLocation.B, country: country, state: state}}
-  })
-}
-
-var getCountryFromGeocodeAddress = function(address) {
-  return address[address.length - 2].long_name;
-}
-
-var getProvinceFromGMapsGeocodeAddress = function(address) {
-  return address[address.length - 3].long_name;
 }
 
 var centerMapOnLocation = function(location) {
@@ -309,7 +272,7 @@ var handleNextQuestionClick = function(e) {
   var nextQuestionID = getNextQuestionID();
   $("#" + nextQuestionID).click();
   highlightQuestion(nextQuestionID);
-  showGeolocateDialog();
+  GeolocatorView.showGeolocateDialog();
 }
 
 var bindEventListeners = function() {
@@ -325,51 +288,9 @@ var loadQuestions = function() {
   }).done(handleGetAllQuestionsResponse);
 }
 
-var hideLoadOverlay = function() {
-  $("#load_container").hide();
-}
-
-var showLoadOverlay = function() {
-  var $overlay = $("#load_container")
-  // $overlay.find("h1").text(LoadMessager.getRandomLoadMessage());
-  $overlay.show();
-}
-
-var createGeolocateDialog = function() {
-  $locate_dialog = $( "#locate_dialog" );
-  $locate_dialog.dialog({
-    open: function(event, ui) { $(".ui-dialog-titlebar-close").hide(); }
-  });
-  $locate_dialog.find("#locate_true").on("click", handleLocateTrueClicked);
-  $locate_dialog.find("#locate_false").on("click", handleLocateFalseClicked);
-  hideGeolocateDialog();
-}
-
-var showGeolocateDialog = function() {
-  if(!CookieManager.isLocateCookieSet()) {
-    showLoadOverlay();
-    $("#locate_dialog").dialog("open");
-    CookieManager.setLocateCookie();
-  }
-}
-
-var hideGeolocateDialog = function() {
-  hideLoadOverlay();
-  $("#locate_dialog").dialog("close");
-}
-
-var handleLocateFalseClicked = function() {
-  hideGeolocateDialog();
-}
-
-var handleLocateTrueClicked = function() {
-  getUserLocation();
-  hideGeolocateDialog();
-}
-
 $(document).ready(function() {
   bindEventListeners();
   createMap();
   loadQuestions();
-  createGeolocateDialog();
+  GeolocatorView.createGeolocateDialog();
 });

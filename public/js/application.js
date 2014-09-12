@@ -68,8 +68,8 @@ var placeMarker = function(pinLoc) {
     userMarker = addPin(pinLoc);
     google.maps.event.addListener(userMarker, 'dragend', updateMarker);
     userMarker.setAnimation(google.maps.Animation.BOUNCE);
-    var questionID = getQuestionID();
-    setQuestionAnswered(questionID);
+    var questionID = QuestionHandler.getQuestionID();
+    QuestionHandler.setQuestionAnswered(questionID);
     $.ajax({
       type: "post",
       url: "question/" + questionID + "/pin/new",
@@ -92,14 +92,6 @@ var updateMarker = function(ev) {
 
 var handleMarkerUpdatedResponse = function() {
   userMarker.setAnimation(null);
-}
-
-var getQuestionID = function() {
-  return $("#question").data("id");
-}
-
-var setQuestionAnswered = function(id) {
-  $("#" + id).addClass("answered");
 }
 
 var centerMapOnLocation = function(location) {
@@ -133,44 +125,14 @@ var resetHeatmap = function() {
   }
 }
 
-var getNextQuestionID = function() {
-  var currentQuestionID = getQuestionID();
-
-  $questions = $("#category_panel a.question");
-  var min = parseInt($questions.first().attr("id"), 10);
-  var max = parseInt($questions.last().attr("id"), 10);
-  var numQuestions = max - min;
-
-  var nextQuestionID = min + (((currentQuestionID-min) + 1) % (numQuestions + 1));
-  while(nextQuestionID != currentQuestionID) {
-    var $question = $("#" + nextQuestionID);
-
-    if($question.hasClass("question") && !$question.hasClass("answered")) {
-      return nextQuestionID;
-    }
-
-    nextQuestionID = min + (((nextQuestionID-min) + 1) % (numQuestions + 1));
-  }
-
-  return min + (((nextQuestionID-min) + 1) % (numQuestions + 1));
-}
-
 var bindEventListeners = function() {
   $("#next-question").on("click", QuestionHandler.handleNextQuestionClick);
   $("#next-question-full").on("click", QuestionHandler.handleNextQuestionClick);
 }
 
-var loadQuestions = function() {
-  // showLoadOverlay();
-  $.ajax({
-    url: "/question",
-    type: "get"
-  }).done(QuestionHandler.handleGetAllQuestionsResponse);
-}
-
 $(document).ready(function() {
   bindEventListeners();
   createMap();
-  loadQuestions();
+  QuestionHandler.loadQuestions();
   GeolocatorView.createGeolocateDialog();
 });

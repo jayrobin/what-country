@@ -1,4 +1,33 @@
 var QuestionHandler = {
+  loadQuestions: function() {
+    $.ajax({
+      url: "/question",
+      type: "get"
+    }).done(QuestionHandler.handleGetAllQuestionsResponse);
+  },
+
+  getNextQuestionID: function() {
+    var currentQuestionID = QuestionHandler.getQuestionID();
+
+    $questions = $("#category_panel a.question");
+    var min = parseInt($questions.first().attr("id"), 10);
+    var max = parseInt($questions.last().attr("id"), 10);
+    var numQuestions = max - min;
+
+    var nextQuestionID = min + (((currentQuestionID-min) + 1) % (numQuestions + 1));
+    while(nextQuestionID != currentQuestionID) {
+      var $question = $("#" + nextQuestionID);
+
+      if($question.hasClass("question") && !$question.hasClass("answered")) {
+        return nextQuestionID;
+      }
+
+      nextQuestionID = min + (((nextQuestionID-min) + 1) % (numQuestions + 1));
+    }
+
+    return min + (((nextQuestionID-min) + 1) % (numQuestions + 1));
+  },
+
   handleGetAllQuestionsResponse: function(result) {
     var questions = result.questions;
     var answered = result.answered;
@@ -15,7 +44,7 @@ var QuestionHandler = {
     });
 
     if(numQuestions == numAnswered) {
-      var questionID = getQuestionID();
+      var questionID = QuestionHandler.getQuestionID();
       $.ajax({
         url: "/question/" + questionID,
         type: "get"
@@ -24,7 +53,7 @@ var QuestionHandler = {
 
     for(var j = 0; j < numAnswered; j++) {
       var question_id = answered[j].question_id;
-      setQuestionAnswered(question_id);
+      QuestionHandler.setQuestionAnswered(question_id);
     }
 
     QuestionHandler.updateNumAnswered();
@@ -107,11 +136,19 @@ var QuestionHandler = {
   handleNextQuestionClick: function(e) {
     e.preventDefault();
 
-    $("#" + getQuestionID()).removeClass("selected");
+    $("#" + QuestionHandler.getQuestionID()).removeClass("selected");
 
-    var nextQuestionID = getNextQuestionID();
+    var nextQuestionID = QuestionHandler.getNextQuestionID();
     $("#" + nextQuestionID).click();
     QuestionHandler.highlightQuestion(nextQuestionID);
     GeolocatorView.showGeolocateDialog();
+  },
+
+  getQuestionID: function() {
+    return $("#question").data("id");
+  },
+
+  setQuestionAnswered: function(id) {
+    $("#" + id).addClass("answered");
   }
 }
